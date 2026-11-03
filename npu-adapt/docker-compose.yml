@@ -1,0 +1,25 @@
+# WeVisCut NPU 部署 — Atlas 300I Duo (310P3)
+# 用法: docker compose up -d   然后访问 http://<host>:8081/
+services:
+  weviscut:
+    image: weviscut-npu:310p-v2
+    container_name: weviscut-studio
+    restart: unless-stopped
+    # ascend docker runtime 自动注入 davinci 设备与驱动挂载
+    environment:
+      - ASCEND_VISIBLE_DEVICES=4,5        # 用哪张卡（逻辑ID），多卡逗号分隔
+      - AICUT_STUDIO_CONFIG=/workspace/WeVisCut/studio_config_npu.yaml
+      - AICUT_STUDIO_PORT=8081
+      - HF_ENDPOINT=https://hf-mirror.com
+    volumes:
+      - /data3/WeVisCut/WeVisCut:/workspace/WeVisCut
+      - /data3/WeVisCut/checkpoints:/workspace/checkpoints:ro
+      - weviscut_workspace:/workspace/WeVisCut/workspace
+    ports:
+      - "8081:8081"
+    shm_size: 32g
+    cpus: 16
+    command: ["bash", "-c", "cd /workspace/WeVisCut && export PYTHONPATH=/workspace/WeVisCut && python3 -m uvicorn studio.app:app --host 0.0.0.0 --port 8081 --workers 1 --ws-ping-interval 30 --ws-ping-timeout 60 --log-level info"]
+
+volumes:
+  weviscut_workspace:

@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+rollouts/
+workspace/
+*.log
+
+# Private corpus runbooks (paths, source inventories)
+*_data_use.md
+private/
